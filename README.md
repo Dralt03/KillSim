@@ -5,8 +5,6 @@ Agents can **move**, **eat**, and **talk**, allowing us to study **emergent soci
 
 This project is inspired by ecosystem simulations and social-deduction-style environments.
 
----
-
 ## Project Objectives
 
 - Build a clean **agent-based simulation** from scratch
@@ -15,8 +13,6 @@ This project is inspired by ecosystem simulations and social-deduction-style env
 - Create a solid base for future extensions (trust, suspicion, incentives)
 
 This is designed as a **research / simulation framework**, not a game.
-
----
 
 ## Current Features (Phase 0)
 
@@ -32,8 +28,6 @@ This is designed as a **research / simulation framework**, not a game.
   - Talk to other agents
 - Food regeneration in rooms
 - Local observation (agents only see others in the same room)
-
----
 
 ## Core Concepts
 
@@ -54,13 +48,9 @@ Complex group behavior arises from:
 - Random movement
 - Social interaction
 
----
-
 ## Requirements
 
 - Python **3.10+**
-
----
 
 ## How to Run
 
