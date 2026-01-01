@@ -1,6 +1,71 @@
-num_agents: 10
+# KillSim Simulation Configuration
+
+simulation:
+  steps: 50
+  seed: 42  
+
+environment:
+  food_regen_rate: 0.05  
+  hunger_increase_rate: 0.05  
+  eat_amount: 0.3  
+  trust_increase: 0.05 
+
 rooms:
+  - id: 0
+    capacity: 2
+    connected_to: [1]
+    initial_food: 1.0
+  
   - id: 1
-    capacity: 10
-    visibility: 0.8
-    food_rate: 0.3
+    capacity: 4
+    connected_to: [0, 2]
+    initial_food: 1.0
+  
+  - id: 2
+    capacity: 1
+    connected_to: [0, 1, 3]
+    initial_food: 1.0
+  
+  - id: 3
+    capacity: 3
+    connected_to: [2, 4]
+    initial_food: 1.0
+  
+  - id: 4
+    capacity: 5
+    connected_to: [3, 5]
+    initial_food: 1.0
+  
+  - id: 5
+    capacity: 2
+    connected_to: [4]
+    initial_food: 1.0
+
+agents:
+  - id: 0
+    location: 0
+    initial_hunger: 0.0
+  
+  - id: 1
+    location: 1
+    initial_hunger: 0.0
+  
+  - id: 2
+    location: 2
+    initial_hunger: 0.0
+  
+  - id: 3
+    location: 2
+    initial_hunger: 0.0
+  
+  - id: 4
+    location: 4
+    initial_hunger: 0.0
+  
+  - id: 5
+    location: 5
+    initial_hunger: 0.0
+  
+  - id: 6
+    location: 5
+    initial_hunger: 0.0

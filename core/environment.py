@@ -50,9 +50,9 @@ class Environment:
                     agent.location = params
             
             elif action == actions.Action.TALK and params is not None:
-                agent.trust[params] = agent.trust.get(params, 0.0) + 0.05
+                agent.trust[params] = round(agent.trust.get(params, 0.0) + 0.05, 2)
+                agent.trust[params] = min(1.0, agent.trust[params])
 
-        print(action_decisions)
         self._update_room_agents()
 
         # Regenerate food in all rooms
@@ -62,3 +62,5 @@ class Environment:
         for agent in self.agents:
             if agent.alive:
                 agent.hunger = min(1.0, agent.hunger + 0.05)
+
+        return action_decisions
