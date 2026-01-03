@@ -6,11 +6,9 @@ import random
 
 
 def main():
-    # Load configuration from YAML
     print("Loading configuration from config/parameters.yaml...")
     config = load_config("config/parameters.yaml")
     
-    # Validate configuration
     errors = validate_config(config)
     if errors:
         print("Configuration validation errors:")
@@ -25,22 +23,19 @@ def main():
     print(f"  Logging: {'enabled' if config.logging.enabled else 'disabled'}")
     print()
     
-    # Set random seed if specified
     if config.simulation.seed is not None:
         random.seed(config.simulation.seed)
         print(f"Random seed set to: {config.simulation.seed}\n")
     
-    # Create rooms from configuration
     rooms = {}
     for room_config in config.rooms:
         rooms[room_config.id] = Room(
             id=room_config.id,
-            capacity=room_config.capacity,
+            capacity=room_config.capacity if room_config.capacity > 0 else 1,
             connectedRooms=room_config.connected_to,
             food=room_config.initial_food
         )
     
-    # Create agents from configuration
     agents = []
     for agent_config in config.agents:
         agent = Agent(
@@ -50,10 +45,8 @@ def main():
         )
         agents.append(agent)
     
-    # Create environment
     env = Environment(rooms, agents)
     
-    # Initialize logger
     logger = None
     if config.logging.enabled:
         logger = SimulationLogger(
@@ -70,7 +63,6 @@ def main():
         env.logger = logger
         print(f"Logger initialized: {config.logging.output_dir}/\n")
     
-    # Run simulation
     print("Starting simulation...\n")
     for t in range(config.simulation.steps):
         if logger:
@@ -79,7 +71,6 @@ def main():
         
         actions = env.step()
         
-        # Display actions taken
         print("\nActions:")
         for agent_id, (action, target) in actions.items():
             action_str = f"Agent {agent_id}: {action.name}"
@@ -87,7 +78,6 @@ def main():
                 action_str += f" -> {target}"
             print(f"  {action_str}")
         
-        # Display agent states
         print("\nAgent States:")
         for agent in agents:
             trust_str = ", ".join([f"{k}:{v:.2f}" for k, v in agent.trust.items()])
@@ -101,7 +91,6 @@ def main():
                 f"trust=[{trust_str}]"
             )
         
-        # Display room states
         print("\nRoom States:")
         for room_id, room in rooms.items():
             agents_in_room = [a.id for a in agents if a.location == room_id]
@@ -114,7 +103,6 @@ def main():
     
     print("Simulation complete!")
 
-    # Export logs and print summary
     if logger:
         print("\nExporting logs...")
         

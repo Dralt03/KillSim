@@ -52,7 +52,10 @@ class Environment:
             
             elif action == actions.Action.MOVE and params is not None:
                 if params in current_room.connectedRooms:
-                    agent.location = params
+                    target_room = self.rooms[params]
+                    if len(target_room.agents) < target_room.capacity:
+                        agent.location = params
+                    
             
             elif action == actions.Action.TALK and params is not None:
                 agent.trust[params] = round(agent.trust.get(params, 0.0) + 0.05, 2)
@@ -66,7 +69,16 @@ class Environment:
         
         for agent in self.agents:
             if agent.alive:
-                agent.hunger = min(1.0, agent.hunger + 0.05)
+                current_room = self.rooms[agent.location]
+                occupancy_ratio = len(current_room.agents) / current_room.capacity
+                
+                hunger_increase = 0.05
+                
+                if occupancy_ratio > 0.75: 
+                    overcrowding_penalty = (occupancy_ratio - 0.75) * 0.1  
+                    hunger_increase += overcrowding_penalty
+                
+                agent.hunger = min(1.0, agent.hunger + hunger_increase)
 
         # Log this step if logger is enabled
         if self.logger:
