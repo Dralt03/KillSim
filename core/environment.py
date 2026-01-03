@@ -1,12 +1,17 @@
-from core import room, agent, actions 
-from typing import Dict, List
+from core import room, agent, actions
+from typing import Dict, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.logger import SimulationLogger
 
 class Environment:
     """Manages the simulation environment with rooms and agents."""
     
-    def __init__(self, rooms: Dict[int, room.Room], agents: List[agent.Agent]):
+    def __init__(self, rooms: Dict[int, room.Room], agents: List[agent.Agent], 
+                 logger: Optional['SimulationLogger'] = None):
         self.rooms = rooms
         self.agents = agents
+        self.logger = logger
         self._update_room_agents()
     
     def _update_room_agents(self):
@@ -63,4 +68,13 @@ class Environment:
             if agent.alive:
                 agent.hunger = min(1.0, agent.hunger + 0.05)
 
+        # Log this step if logger is enabled
+        if self.logger:
+            self.logger.log_step(
+                timestep=getattr(self, '_current_step', 0),
+                agents=self.agents,
+                rooms=self.rooms,
+                action_decisions=action_decisions
+            )
+        
         return action_decisions

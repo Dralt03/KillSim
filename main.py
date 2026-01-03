@@ -1,6 +1,6 @@
 """KillSim - Social Ecosystem Simulation"""
 
-from core import Room, Agent, Environment
+from core import Room, Agent, Environment, SimulationLogger
 from core.config import load_config, validate_config
 import random
 
@@ -22,6 +22,7 @@ def main():
     print(f"  Rooms: {len(config.rooms)}")
     print(f"  Agents: {len(config.agents)}")
     print(f"  Steps: {config.simulation.steps}")
+    print(f"  Logging: {'enabled' if config.logging.enabled else 'disabled'}")
     print()
     
     # Set random seed if specified
@@ -52,12 +53,29 @@ def main():
     # Create environment
     env = Environment(rooms, agents)
     
+    # Initialize logger
+    logger = None
+    if config.logging.enabled:
+        logger = SimulationLogger(
+            output_dir=config.logging.output_dir,
+            enabled=config.logging.enabled,
+            log_interval=config.logging.log_interval
+        )
+        logger.set_metadata(
+            total_steps=config.simulation.steps,
+            num_agents=len(agents),
+            num_rooms=len(rooms),
+            seed=config.simulation.seed
+        )
+        env.logger = logger
+        print(f"Logger initialized: {config.logging.output_dir}/\n")
+    
     # Run simulation
     print("Starting simulation...\n")
     for t in range(config.simulation.steps):
-        print(f"\n{'='*60}")
+        if logger:
+            env._current_step = t
         print(f"Time step {t}")
-        print('='*60)
         
         actions = env.step()
         
@@ -94,9 +112,22 @@ def main():
                 f"({len(agents_in_room)}/{room.capacity})"
             )
     
-    print(f"\n{'='*60}")
     print("Simulation complete!")
-    print('='*60)
+
+    # Export logs and print summary
+    if logger:
+        print("\nExporting logs...")
+        
+        if "json" in config.logging.formats:
+            json_file = logger.export_json()
+            print(f"  JSON: {json_file}")
+        
+        if "csv" in config.logging.formats:
+            csv_files = logger.export_csv()
+            for file_type, filepath in csv_files.items():
+                print(f"  CSV ({file_type}): {filepath}")
+        
+        logger.print_summary()
 
 
 if __name__ == "__main__":

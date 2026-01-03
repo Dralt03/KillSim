@@ -4,6 +4,19 @@ from typing import List, Optional
 from dataclasses import dataclass
 
 @dataclass
+class LoggingConfig:
+    """Configuration for simulation logging."""
+    enabled: bool = True
+    output_dir: str = "logs"
+    formats: List[str] = None  # Will default to ["json", "csv"]
+    log_interval: int = 1  # Log every N steps
+    
+    def __post_init__(self):
+        if self.formats is None:
+            self.formats = ["json", "csv"]
+
+
+@dataclass
 class SimulationConfig:
     """Configuration for simulation runtime."""
     steps: int = 50
@@ -43,6 +56,11 @@ class Config:
     environment: EnvironmentConfig
     rooms: List[RoomConfig]
     agents: List[AgentConfig]
+    logging: LoggingConfig = None
+    
+    def __post_init__(self):
+        if self.logging is None:
+            self.logging = LoggingConfig()
 
 
 def load_config(config_path: str = "config/parameters.yaml") -> Config:
@@ -109,11 +127,21 @@ def load_config(config_path: str = "config/parameters.yaml") -> Config:
         for agent in agents_data
     ]
     
+    # Parse logging config
+    logging_data = data.get('logging', {})
+    logging = LoggingConfig(
+        enabled=logging_data.get('enabled', True),
+        output_dir=logging_data.get('output_dir', 'logs'),
+        formats=logging_data.get('formats', ['json', 'csv']),
+        log_interval=logging_data.get('log_interval', 1)
+    )
+    
     return Config(
         simulation=simulation,
         environment=environment,
         rooms=rooms,
-        agents=agents
+        agents=agents,
+        logging=logging
     )
 
 
